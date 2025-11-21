@@ -1,6 +1,6 @@
 export const API_CONFIG = {
-  RAWG_API_KEY: import.meta.env.VITE_API_KEY,
-  RAWG_API_URL: import.meta.env.VITE_API_URL,
+  RAWG_API_KEY: import.meta.env.RAWG_API_KEY,
+  RAWG_API_URL: import.meta.env.RAWG_API_URL,
   ENDPOINTS: {
     GAMES: "/games",
     GAME_DETAILS: (id) => `/games/${id}`,
