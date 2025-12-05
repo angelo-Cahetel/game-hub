@@ -2,25 +2,14 @@
   "name": "game-library-backend",
   "version": "1.0.0",
   "type": "module",
-  "description": "Backend API para Game Library",
-  "main": "src/server.js",
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "prisma:seed": "node prisma/seed.js"
   },
-  "keywords": [
-    "game",
-    "library",
-    "api"
-  ],
-  "author": "Angelo Mendes",
-  "license": "MIT",
   "dependencies": {
     "@prisma/client": "^5.7.0",
     "bcryptjs": "^2.4.3",
@@ -32,7 +21,6 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
-    "jest": "^29.7.0",
     "nodemon": "^3.0.2",
     "prisma": "^5.7.0"
   }
