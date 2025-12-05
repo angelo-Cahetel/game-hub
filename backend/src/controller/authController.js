@@ -1,10 +1,10 @@
-import bcrypt from "bcryptjs/dist/bcrypt";
+import bcrypt from "bcrypt";
 import prisma from "../config/database.js";
 import { generateToken } from "../utils/jwt.js";
 
 export const register = async (req, res, next) => {
   try {
-    const { email, password, generateToken };
+    const { email, password } = req.body;
 
     // Validação
     if (!email || !password) {
