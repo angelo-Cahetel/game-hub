@@ -1,0 +1,19 @@
+name: Linting
+
+on: pull_request
+
+commitlint:
+  name: commitlint
+  runs-on: ubuntu-latest
+  steps:
+    - use: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - uses: actions/setup-node@v4
+      with:
+        node-version: "lts/krypto"
+
+    - run: npm ci
+
+    - run: npx commitlint --from ${{github.envent.pull_request.base.sha }} --to ${{ github.envent.pull_request.head.sha }} --verbose
