@@ -1,3 +1,11 @@
+@import "tailwindcss";
+
+@theme {
+  --color-roxo: #5631dd;
+  --color-laranja: #fb923c;
+  --color-azul: #313fdd;
+}
+
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
