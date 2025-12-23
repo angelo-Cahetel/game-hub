@@ -23,7 +23,7 @@ export const gamesApi = {
     return data.game;
   },
 
-  async deleteFame(gameId) {
+  async deleteGame(gameId) {
     await httpClient.delete(`/games/${gameId}`);
   },
 
