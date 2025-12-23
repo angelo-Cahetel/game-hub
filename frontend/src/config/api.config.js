@@ -1,11 +1,5 @@
 export const API_CONFIG = {
-  RAWG_API_KEY: import.meta.env.RAWG_API_KEY,
-  RAWG_API_URL: import.meta.env.RAWG_API_URL,
-  ENDPOINTS: {
-    GAMES: "/games",
-    GAME_DETAILS: (id) => `/games/${id}`,
-    SCREENSHOTS: (id) => `/games/${id}/screenshots`,
-    ACHIVEMENTS: (id) => `/games/${id}/achievements`,
-    PLATFORMS: "/platforms",
-  },
+  BASE_URL: import.meta.env.VITE_API_URL || "http://localhost:3001/api",
+  RAWG_API_KEY: import.meta.env.VITE_RAWG_API_KEY,
+  RAWG_BASE_URL: "https://api.rawg.io/api",
 };
