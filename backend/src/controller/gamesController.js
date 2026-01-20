@@ -94,7 +94,7 @@ export const updateGame = async (req, res, next) => {
     });
 
     res.json({ game: updateGame });
-  } catch (errror) {
+  } catch (error) {
     next(error);
   }
 };
