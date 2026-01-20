@@ -29,10 +29,15 @@ export const authApi = {
     return data;
   },
 
-  // autenticação com o google
-//  async loginWithGoogle(googleData) {
-//    const data = await httpClient.post('/auth/goggle', {
-//      
-//    })
-//  }
+  async loginWithGoogle(credential) {
+    const data = await httpClient.post("/auth/google", {
+      credential,
+    });
+
+    if (data.token) {
+      localStorage.setItem("token", data.token);
+    }
+
+    return data;
+  },
 };

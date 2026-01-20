@@ -1,15 +1,33 @@
 import bcrypt from "../utils/bcrypt.js";
 import prisma from "../config/database.js";
 import { generateToken } from "../utils/jwt.js";
+import { OAuth2Client } from "google-auth-library";
+import { z } from "zod";
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+// Schemas de validação
+const registerSchema = z.object({
+  email: z.string().email("Email inválido"),
+  password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres"),
+  name: z.string().min(2, "O nome deve ter no mínimo 2 caracteres"),
+});
+
+const loginSchema = z.object({
+  email: z.string().email("Email inválido"),
+  password: z.string().min(1, "Senha é obrigatória"),
+});
 
 // Cria novo usuário
 export const register = async (req, res, next) => {
   try {
-    const { email, password, name } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ error: "Email e senha são obrigatórios" });
+    // Validação
+    const result = registerSchema.safeParse(req.body);
+    if (!result.success) {
+      return res.status(400).json({ error: result.error.errors[0].message });
     }
+
+    const { email, password, name } = result.data;
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
@@ -44,15 +62,17 @@ export const register = async (req, res, next) => {
 // autenticar usuário
 export const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({ error: "Email e senha são obrigatórios" });
+    // Validação
+    const result = loginSchema.safeParse(req.body);
+    if (!result.success) {
+      return res.status(400).json({ error: result.error.errors[0].message });
     }
+
+    const { email, password } = result.data;
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user || !user.password) {
-      return res.status(401).json({ errror: "Credenciais inválidas" });
+      return res.status(401).json({ error: "Credenciais inválidas" });
     }
 
     const isValidPassword = await bcrypt.compare(password, user.password);
@@ -76,10 +96,24 @@ export const login = async (req, res, next) => {
   }
 };
 
-// implementar login com Google
+// implementar login com Google de forma segura
 export const googleAuth = async (req, res, next) => {
   try {
-    const { email, name, avatar, googleId } = req.body;
+    // O frontend deve enviar o 'credential' (ID Token)
+    const { credential } = req.body;
+
+    if (!credential) {
+      return res.status(400).json({ error: "Token do Google não fornecido" });
+    }
+
+    // Verificar o token com o Google
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    
+    const payload = ticket.getPayload();
+    const { email, name, picture, sub: googleId } = payload;
 
     let user = await prisma.user.findUnique({ where: { email } });
 
@@ -88,11 +122,20 @@ export const googleAuth = async (req, res, next) => {
         data: {
           email,
           name,
-          avatar,
+          avatar: picture,
           provider: "google",
           providerId: googleId,
         },
       });
+    } else if (user.provider !== 'google') {
+       // Opcional: Permitir vincular contas ou bloquear
+       // Por enquanto, atualizamos o avatar se não tiver e logamos
+       if (!user.avatar) {
+           await prisma.user.update({
+               where: { id: user.id },
+               data: { avatar: picture, provider: "google", providerId: googleId } // Vincula conta implicitamente
+           });
+       }
     }
 
     const token = generateToken(user.id);
@@ -107,7 +150,8 @@ export const googleAuth = async (req, res, next) => {
       token,
     });
   } catch (error) {
-    next(error);
+    console.error("Google Auth Error:", error);
+    res.status(401).json({ error: "Falha na autenticação com Google" });
   }
 };
 
