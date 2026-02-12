@@ -1,14 +1,13 @@
-import './App.css'
+import "./App.css";
+import HomeScreen from "./pages/HomeScreen";
+import { Header } from "./sections";
 
 function App() {
-
   return (
     <>
-      <div>
-        <h1>Hello World</h1>
-      </div>
+      <HomeScreen />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
